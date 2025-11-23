@@ -294,134 +294,121 @@ let selectedComponents = {
     case: null
 };
 
-// ฟังก์ชันเปลี่ยนแท็บ
-function initializeTabs() {
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            // ลบคลาส active จากแท็บทั้งหมด
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            // เพิ่มคลาส active ให้แท็บที่คลิก
-            tab.classList.add('active');
-            
-            // ซ่อนเนื้อหาทั้งหมด
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // แสดงเนื้อหาของแท็บที่เลือก
-            const tabId = tab.getAttribute('data-tab');
-            document.getElementById(`${tabId}-tab`).classList.add('active');
-        });
-    });
+// ฟังก์ชันตรวจสอบว่าอยู่ในหน้าไหน
+function isPage(page) {
+    return window.location.pathname.includes(page) || 
+           document.querySelector('title').textContent.includes(page);
 }
 
-// ฟังก์ชันสร้างคอมโพเนนต์กริดสำหรับโหมด Manual
-function initializeManualBuild() {
-    for (const category in components) {
-        const grid = document.getElementById(`${category}-grid`);
-        grid.innerHTML = '';
-        
-        components[category].forEach(component => {
-            const card = document.createElement('div');
-            card.className = 'component-card';
-            card.innerHTML = `
-                <div class="component-image">
-                    <i class="fas fa-${getComponentIcon(category)}"></i>
-                </div>
-                <h4>${component.name}</h4>
-                <p>${component.description}</p>
-                <div class="component-price">
-                    <i class="fas fa-tag"></i>
-                    ${component.price.toLocaleString()} บาท
-                </div>
-            `;
-            
-            card.addEventListener('click', () => {
-                selectComponent(category, component);
-            });
-            
-            grid.appendChild(card);
-        });
-    }
-}
-
-// ฟังก์ชันไอคอนสำหรับแต่ละประเภทคอมโพเนนต์
-function getComponentIcon(category) {
-    const icons = {
-        cpu: 'microchip',
-        gpu: 'gamepad',
-        ram: 'memory',
-        storage: 'hdd',
-        psu: 'bolt',
-        case: 'desktop'
-    };
-    return icons[category] || 'cube';
-}
-
-// ฟังก์ชันเลือกคอมโพเนนต์ในโหมด Manual
-function selectComponent(category, component) {
-    selectedComponents[category] = component;
+// ฟังก์ชันหลักที่รันเมื่อโหลดหน้า
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('StephandComputer - Page loaded successfully');
     
-    // อัพเดท UI
-    document.getElementById(`manual-${category}`).textContent = component.name;
-    
-    // อัพเดทการเลือกในกริด
-    document.querySelectorAll(`#${category}-grid .component-card`).forEach(card => {
-        card.classList.remove('selected');
-    });
-    
-    // หาการ์ดที่ถูกเลือกและเพิ่มคลาส selected
-    const cards = document.querySelectorAll(`#${category}-grid .component-card`);
-    for (let i = 0; i < cards.length; i++) {
-        if (cards[i].querySelector('h4').textContent === component.name) {
-            cards[i].classList.add('selected');
-            break;
-        }
+    // ตรวจสอบหน้าและรันฟังก์ชันที่เกี่ยวข้อง
+    if (isPage('auto-build') || isPage('จัดสเปกตามงบ')) {
+        console.log('Initializing Auto Build page');
+        initializeAutoBuild();
     }
     
-    updateTotalPrice();
-}
-
-// ฟังก์ชันอัพเดทราคารวมในโหมด Manual
-function updateTotalPrice() {
-    let total = 0;
-    for (const category in selectedComponents) {
-        if (selectedComponents[category]) {
-            total += selectedComponents[category].price;
-        }
+    if (isPage('manual-build') || isPage('จัดสเปกเอง')) {
+        console.log('Initializing Manual Build page');
+        initializeManualBuild();
     }
     
-    document.getElementById('total-price').textContent = total.toLocaleString();
+    // ตั้งค่าปุ่ม preset ทุกหน้า
+    initializePresetButtons();
     
-    // ตรวจสอบงบประมาณ
+    // ตั้งค่า navigation active state
+    initializeNavigation();
+});
+
+// ฟังก์ชันตั้งค่า Auto Build
+function initializeAutoBuild() {
+    console.log('Setting up Auto Build functionality');
+    
     const budgetInput = document.getElementById('budget');
-    const budgetStatus = document.getElementById('budget-status');
-    
-    if (budgetInput.value) {
-        const budget = parseInt(budgetInput.value);
+    if (budgetInput) {
+        budgetInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                buildPC();
+            }
+        });
         
-        if (total > budget) {
-            budgetStatus.innerHTML = `
-                <div class="budget-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    เกินงบประมาณ ${(total - budget).toLocaleString()} บาท
-                </div>
-            `;
-        } else {
-            budgetStatus.innerHTML = `
-                <div class="budget-ok">
-                    <i class="fas fa-check-circle"></i>
-                    เหลืองบประมาณ ${(budget - total).toLocaleString()} บาท
-                </div>
-            `;
-        }
+        // Clear placeholder when input is focused
+        budgetInput.addEventListener('focus', function() {
+            if (this.value === '') {
+                this.placeholder = '';
+            }
+        });
+        
+        budgetInput.addEventListener('blur', function() {
+            if (this.value === '') {
+                this.placeholder = 'กรอกงบประมาณ (บาท)';
+            }
+        });
     }
+}
+
+// ฟังก์ชันตั้งค่าปุ่ม preset
+function initializePresetButtons() {
+    console.log('Setting up preset buttons');
+    
+    const presetButtons = document.querySelectorAll('.preset-btn');
+    
+    if (presetButtons.length === 0) {
+        console.log('No preset buttons found');
+        return;
+    }
+    
+    presetButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const budget = this.getAttribute('data-budget');
+            console.log('Preset button clicked:', budget);
+            
+            const budgetInput = document.getElementById('budget');
+            if (budgetInput) {
+                budgetInput.value = budget;
+                budgetInput.focus();
+                
+                // ถ้าอยู่ในหน้า auto-build ให้คำนวณทันที
+                if (isPage('auto-build') || isPage('จัดสเปกตามงบ')) {
+                    console.log('Auto-calculating for budget:', budget);
+                    buildPC();
+                }
+            }
+        });
+    });
+    
+    console.log('Preset buttons initialized:', presetButtons.length);
+}
+
+// ฟังก์ชันตั้งค่า navigation
+function initializeNavigation() {
+    const currentPage = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === currentPage) {
+            link.classList.add('active');
+        }
+    });
 }
 
 // ฟังก์ชันจัดสเปกตามงบ
 function buildPC() {
-    const budget = parseInt(document.getElementById('budget').value);
+    console.log('Building PC...');
+    
+    const budgetInput = document.getElementById('budget');
     const resultDiv = document.getElementById('auto-result');
+    
+    if (!budgetInput || !resultDiv) {
+        console.error('Required elements not found');
+        return;
+    }
+    
+    const budget = parseInt(budgetInput.value);
+    console.log('Budget:', budget);
     
     if (!budget || budget < 8000) {
         resultDiv.innerHTML = `
@@ -437,6 +424,7 @@ function buildPC() {
     let cpu, gpu, ram, storage, psu, casing;
     let totalCost = 0;
     
+    // Logic การเลือกคอมโพเนนต์ตามงบ
     if (budget <= 15000) {
         cpu = components.cpu[0]; // Intel i3
         gpu = components.gpu[0]; // GTX 1650
@@ -475,6 +463,8 @@ function buildPC() {
     }
     
     totalCost = cpu.price + gpu.price + ram.price + storage.price + psu.price + casing.price;
+    
+    console.log('Generated spec:', { cpu: cpu.name, gpu: gpu.name, totalCost });
     
     resultDiv.innerHTML = `
         <div class="spec-result">
@@ -516,10 +506,120 @@ function buildPC() {
     `;
 }
 
+// ฟังก์ชันเริ่มต้น Manual Build
+function initializeManualBuild() {
+    if (!document.getElementById('cpu-grid')) {
+        console.log('Manual Build page not detected');
+        return;
+    }
+    
+    console.log('Initializing Manual Build components');
+    
+    for (const category in components) {
+        const grid = document.getElementById(`${category}-grid`);
+        if (!grid) continue;
+        
+        grid.innerHTML = '';
+        
+        components[category].forEach(component => {
+            const card = document.createElement('div');
+            card.className = 'component-card';
+            card.innerHTML = `
+                <div class="component-image">
+                    <i class="fas fa-${getComponentIcon(category)}"></i>
+                </div>
+                <h4>${component.name}</h4>
+                <p>${component.description}</p>
+                <div class="component-price">
+                    <i class="fas fa-tag"></i>
+                    ${component.price.toLocaleString()} บาท
+                </div>
+            `;
+            
+            card.addEventListener('click', () => {
+                selectComponent(category, component);
+            });
+            
+            grid.appendChild(card);
+        });
+    }
+    
+    console.log('Manual Build initialized');
+}
+
+// ฟังก์ชันไอคอนสำหรับแต่ละประเภทคอมโพเนนต์
+function getComponentIcon(category) {
+    const icons = {
+        cpu: 'microchip',
+        gpu: 'gamepad',
+        ram: 'memory',
+        storage: 'hdd',
+        psu: 'bolt',
+        case: 'desktop'
+    };
+    return icons[category] || 'cube';
+}
+
+// ฟังก์ชันเลือกคอมโพเนนต์ในโหมด Manual
+function selectComponent(category, component) {
+    selectedComponents[category] = component;
+    
+    // อัพเดท UI
+    const element = document.getElementById(`manual-${category}`);
+    if (element) element.textContent = component.name;
+    
+    updateTotalPrice();
+}
+
+// ฟังก์ชันอัพเดทราคารวมในโหมด Manual
+function updateTotalPrice() {
+    let total = 0;
+    for (const category in selectedComponents) {
+        if (selectedComponents[category]) {
+            total += selectedComponents[category].price;
+        }
+    }
+    
+    const totalElement = document.getElementById('total-price');
+    if (totalElement) {
+        totalElement.textContent = total.toLocaleString();
+        
+        // อัพเดทสถานะงบประมาณ
+        updateBudgetStatus(total);
+    }
+}
+
+// ฟังก์ชันอัพเดทสถานะงบประมาณ
+function updateBudgetStatus(total) {
+    const budgetStatus = document.getElementById('budget-status');
+    if (!budgetStatus) return;
+    
+    const budgetInput = document.getElementById('budget');
+    if (budgetInput && budgetInput.value) {
+        const budget = parseInt(budgetInput.value);
+        
+        if (total > budget) {
+            budgetStatus.innerHTML = `
+                <div class="budget-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    เกินงบประมาณ ${(total - budget).toLocaleString()} บาท
+                </div>
+            `;
+        } else {
+            budgetStatus.innerHTML = `
+                <div class="budget-ok">
+                    <i class="fas fa-check-circle"></i>
+                    เหลืองบประมาณ ${(budget - total).toLocaleString()} บาท
+                </div>
+            `;
+        }
+    }
+}
+
 // ฟังก์ชันบันทึกสเปก
 function saveBuild() {
-    const total = document.getElementById('total-price').textContent;
-    if (total === '0') {
+    const total = document.getElementById('total-price')?.textContent;
+    if (!total || total === '0') {
         alert('กรุณาเลือกคอมโพเนนต์ก่อนบันทึก');
         return;
     }
@@ -530,8 +630,8 @@ function saveBuild() {
 
 // ฟังก์ชันแชร์สเปก
 function shareBuild() {
-    const total = document.getElementById('total-price').textContent;
-    if (total === '0') {
+    const total = document.getElementById('total-price')?.textContent;
+    if (!total || total === '0') {
         alert('กรุณาเลือกคอมโพเนนต์ก่อนแชร์');
         return;
     }
@@ -541,34 +641,13 @@ function shareBuild() {
 
 // ฟังก์ชันเปลี่ยนไปที่แท็บ Manual
 function switchToManual() {
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
-    document.querySelector('.tab[data-tab="manual"]').classList.add('active');
-    document.getElementById('manual-tab').classList.add('active');
+    window.location.href = 'manual-build.html';
 }
 
-// ฟังก์ชันตั้งค่าปุ่ม Preset Budget
-function initializePresetButtons() {
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const budget = btn.getAttribute('data-budget');
-            document.getElementById('budget').value = budget;
-            buildPC();
-        });
-    });
-}
-
-// เริ่มต้นแอปพลิเคชันเมื่อโหลดหน้า
-document.addEventListener('DOMContentLoaded', function() {
-    initializeTabs();
-    initializeManualBuild();
-    initializePresetButtons();
-    
-    // ตั้งค่าให้ buildPC ทำงานเมื่อกด Enter ในช่องงบประมาณ
-    document.getElementById('budget').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            buildPC();
-        }
-    });
+// Error handling
+window.addEventListener('error', function(e) {
+    console.error('JavaScript Error:', e.error);
 });
+
+// ตรวจสอบว่า JavaScript ทำงาน
+console.log('StephandComputer JavaScript loaded successfully');
