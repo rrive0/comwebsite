@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดสเปกเอง - PC Builder Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html" style="color: inherit; text-decoration: none;">
+                        <i class="fas fa-desktop"></i>
+                        <h1>PC Builder Pro</h1>
+                    </a>
+                </div>
+                <p class="tagline">จัดสเปกคอมพิวเตอร์ด้วยตัวเอง</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="page-nav">
+        <div class="container">
+            <a href="index.html" class="nav-back">
+                <i class="fas fa-arrow-left"></i>
+                กลับหน้าแรก
+            </a>
+            <div class="nav-links">
+                <a href="auto-build.html" class="nav-link">จัดสเปกตามงบ</a>
+                <a href="manual-build.html" class="nav-link active">จัดสเปกเอง</a>
+                <a href="compare.html" class="nav-link">เปรียบเทียบสเปก</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-cogs"></i> จัดสเปกคอมพิวเตอร์ด้วยตัวเอง</h2>
+                    <p>เลือกคอมโพเนนต์แต่ละส่วนตามความต้องการของคุณ</p>
+                </div>
+
+                <!-- Component Selection -->
+                <div class="component-sections">
+                    <!-- CPU Section -->
+                    <section class="component-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-microchip"></i>
+                            หน่วยประมวลผล (CPU)
+                        </h3>
+                        <div class="component-grid" id="cpu-grid">
+                            <!-- Dynamic content -->
+                        </div>
+                    </section>
+
+                    <!-- GPU Section -->
+                    <section class="component-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-gamepad"></i>
+                            การ์ดจอ (GPU)
+                        </h3>
+                        <div class="component-grid" id="gpu-grid">
+                            <!-- Dynamic content -->
+                        </div>
+                    </section>
+
+                    <!-- RAM Section -->
+                    <section class="component-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-memory"></i>
+                            หน่วยความจำ (RAM)
+                        </h3>
+                        <div class="component-grid" id="ram-grid">
+                            <!-- Dynamic content -->
+                        </div>
+                    </section>
+
+                    <!-- Storage Section -->
+                    <section class="component-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-hdd"></i>
+                            ที่เก็บข้อมูล (Storage)
+                        </h3>
+                        <div class="component-grid" id="storage-grid">
+                            <!-- Dynamic content -->
+                        </div>
+                    </section>
+
+                    <!-- PSU Section -->
+                    <section class="component-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-bolt"></i>
+                            แหล่งจ่ายไฟ (PSU)
+                        </h3>
+                        <div class="component-grid" id="psu-grid">
+                            <!-- Dynamic content -->
+                        </div>
+                    </section>
+
+                    <!-- Case Section -->
+                    <section class="component-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-desktop"></i>
+                            เคส (Case)
+                        </h3>
+                        <div class="component-grid" id="case-grid">
+                            <!-- Dynamic content -->
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Build Summary -->
+                <div class="build-summary">
+                    <div class="summary-header">
+                        <h3><i class="fas fa-clipboard-list"></i> สรุปสเปกคอมพิวเตอร์</h3>
+                        <div class="total-price">
+                            ราคารวม: <span id="total-price">0</span> บาท
+                        </div>
+                    </div>
+                    
+                    <div class="spec-summary">
+                        <div class="spec-item">
+                            <span class="spec-label">CPU:</span>
+                            <span class="spec-value" id="manual-cpu">-</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">GPU:</span>
+                            <span class="spec-value" id="manual-gpu">-</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">RAM:</span>
+                            <span class="spec-value" id="manual-ram">-</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Storage:</span>
+                            <span class="spec-value" id="manual-storage">-</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">PSU:</span>
+                            <span class="spec-value" id="manual-psu">-</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Case:</span>
+                            <span class="spec-value" id="manual-case">-</span>
+                        </div>
+                    </div>
+                    
+                    <div id="budget-status" class="budget-status">
+                        <div class="status-placeholder">
+                            <i class="fas fa-info-circle"></i>
+                            กรุณากำหนดงบประมาณในหน้า "จัดสเปกตามงบ" เพื่อตรวจสอบ
+                        </div>
+                    </div>
+                    
+                    <div class="summary-actions">
+                        <button class="btn btn-secondary" onclick="saveBuild()">
+                            <i class="fas fa-save"></i>
+                            บันทึกสเปก
+                        </button>
+                        <button class="btn btn-primary" onclick="shareBuild()">
+                            <i class="fas fa-share"></i>
+                            แชร์สเปก
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>PC Builder Pro</h3>
+                    <p>เครื่องมือประกอบคอมพิวเตอร์มืออาชีพสำหรับทุกคน</p>
+                </div>
+                <div class="footer-section">
+                    <h4>ติดต่อเรา</h4>
+                    <p>Email: contact@pcbuilder.com</p>
+                    <p>โทร: 02-123-4567</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 PC Builder Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
